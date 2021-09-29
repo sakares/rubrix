@@ -22,6 +22,7 @@ from fastapi.responses import StreamingResponse
 from rubrix.server.datasets.model import CreationDatasetRequest
 from rubrix.server.datasets.service import DatasetsService, create_dataset_service
 from rubrix.server.security import auth
+from rubrix.server.tasks.commons import TeamsQueryParams
 from rubrix.server.tasks.commons.api import BulkResponse, PaginationParams, TaskType
 from rubrix.server.tasks.commons.helpers import takeuntil
 from rubrix.server.tasks.text2text.api.model import (
@@ -52,6 +53,7 @@ router = APIRouter(tags=[TASK_TYPE], prefix="/datasets")
 def bulk_records(
     name: str,
     bulk: Text2TextBulkData,
+    teams_query: TeamsQueryParams = Depends(),
     service: Text2TextService = Depends(text2text_service),
     datasets: DatasetsService = Depends(create_dataset_service),
     current_user: User = Security(auth.get_user, scopes=[]),
@@ -65,6 +67,8 @@ def bulk_records(
         The dataset name
     bulk:
         The bulk data
+    teams_query:
+        Common task query params
     service:
         the Service
     datasets:
@@ -78,15 +82,15 @@ def bulk_records(
     """
 
     task = TASK_TYPE
-
+    owner = current_user.check_team(teams_query.team)
     datasets.upsert(
         CreationDatasetRequest(**{**bulk.dict(), "name": name}),
-        owner=current_user.default_team,
+        owner=owner,
         task=task,
     )
     result = service.add_records(
         dataset=name,
-        owner=current_user.default_team,
+        owner=owner,
         records=bulk.records,
     )
     return BulkResponse(
@@ -105,6 +109,7 @@ def bulk_records(
 def search_records(
     name: str,
     search: Text2TextSearchRequest = None,
+    teams_query: TeamsQueryParams = Depends(),
     pagination: PaginationParams = Depends(),
     service: Text2TextService = Depends(text2text_service),
     datasets: DatasetsService = Depends(create_dataset_service),
@@ -117,6 +122,8 @@ def search_records(
     ----------
     name:
         The dataset name
+    teams_query:
+        The task common query params
     search:
         THe search query request
     pagination:
@@ -134,7 +141,7 @@ def search_records(
 
     """
 
-    datasets.find_by_name(name, owner=current_user.default_team)
+    datasets.find_by_name(name, owner=current_user.check_team(teams_query.team))
     search = search or Text2TextSearchRequest()
     query = search.query or Text2TextQuery()
 
@@ -190,6 +197,7 @@ def scan_data_response(
 async def stream_data(
     name: str,
     query: Optional[Text2TextQuery] = None,
+    teams_query: TeamsQueryParams = Depends(),
     limit: Optional[int] = Query(None, description="Limit loaded records", gt=0),
     service: Text2TextService = Depends(text2text_service),
     datasets: DatasetsService = Depends(create_dataset_service),
@@ -204,6 +212,8 @@ async def stream_data(
         The dataset name
     query:
         The stream data query
+    teams_query:
+        The task common query params
     limit:
         The load number of records limit. Optional
     service:
@@ -215,7 +225,9 @@ async def stream_data(
 
     """
     query = query or Text2TextQuery()
-    found = datasets.find_by_name(name, owner=current_user.default_team)
+    found = datasets.find_by_name(
+        name, owner=current_user.check_team(teams_query.team)
+    )
     data_stream = service.read_dataset(found.name, owner=found.owner, query=query)
 
     return scan_data_response(
