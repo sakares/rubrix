@@ -81,12 +81,12 @@ def bulk_records(
 
     datasets.upsert(
         CreationDatasetRequest(**{**bulk.dict(), "name": name}),
-        owner=current_user.current_group,
+        owner=current_user.default_team,
         task=task,
     )
     result = service.add_records(
         dataset=name,
-        owner=current_user.current_group,
+        owner=current_user.default_team,
         records=bulk.records,
     )
     return BulkResponse(
@@ -134,13 +134,13 @@ def search_records(
 
     """
 
-    datasets.find_by_name(name, owner=current_user.current_group)
+    datasets.find_by_name(name, owner=current_user.default_team)
     search = search or Text2TextSearchRequest()
     query = search.query or Text2TextQuery()
 
     result = service.search(
         dataset=name,
-        owner=current_user.current_group,
+        owner=current_user.default_team,
         query=query,
         sort_by=search.sort,
         record_from=pagination.from_,
@@ -215,7 +215,7 @@ async def stream_data(
 
     """
     query = query or Text2TextQuery()
-    found = datasets.find_by_name(name, owner=current_user.current_group)
+    found = datasets.find_by_name(name, owner=current_user.default_team)
     data_stream = service.read_dataset(found.name, owner=found.owner, query=query)
 
     return scan_data_response(
