@@ -30,7 +30,7 @@ class User:
     email: Union[Unset, str] = UNSET
     full_name: Union[Unset, str] = UNSET
     disabled: Union[Unset, bool] = UNSET
-    user_groups: Union[Unset, List[str]] = UNSET
+    teams: Union[Unset, List[str]] = UNSET
     additional_properties: Dict[str, Any] = attr.ib(init=False, factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -38,9 +38,9 @@ class User:
         email = self.email
         full_name = self.full_name
         disabled = self.disabled
-        user_groups: Union[Unset, List[Any]] = UNSET
-        if not isinstance(self.user_groups, Unset):
-            user_groups = self.user_groups
+        teams: Union[Unset, List[Any]] = UNSET
+        if not isinstance(self.teams, Unset):
+            teams = self.teams
 
         field_dict: Dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -55,8 +55,8 @@ class User:
             field_dict["full_name"] = full_name
         if disabled is not UNSET:
             field_dict["disabled"] = disabled
-        if user_groups is not UNSET:
-            field_dict["user_groups"] = user_groups
+        if teams is not UNSET:
+            field_dict["teams"] = teams
 
         return field_dict
 
@@ -71,14 +71,14 @@ class User:
 
         disabled = d.pop("disabled", UNSET)
 
-        user_groups = cast(List[str], d.pop("user_groups", UNSET))
+        teams = cast(List[str], d.pop("teams", UNSET))
 
         user = cls(
             username=username,
             email=email,
             full_name=full_name,
             disabled=disabled,
-            user_groups=user_groups,
+            teams=teams,
         )
 
         user.additional_properties = d

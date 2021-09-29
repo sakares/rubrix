@@ -22,7 +22,7 @@ from ...models.bulk_response import BulkResponse
 from ...models.error_message import ErrorMessage
 from ...models.http_validation_error import HTTPValidationError
 from ...models.text_classification_bulk_data import TextClassificationBulkData
-from ...types import Response
+from ...types import UNSET, Response, Unset
 
 
 def _get_kwargs(
@@ -30,6 +30,7 @@ def _get_kwargs(
     client: AuthenticatedClient,
     name: str,
     json_body: TextClassificationBulkData,
+    team: Union[Unset, str] = UNSET,
 ) -> Dict[str, Any]:
     url = "{}/api/datasets/{name}/TextClassification:bulk".format(
         client.base_url, name=name
@@ -37,6 +38,11 @@ def _get_kwargs(
 
     headers: Dict[str, Any] = client.get_headers()
     cookies: Dict[str, Any] = client.get_cookies()
+
+    params: Dict[str, Any] = {
+        "team": team,
+    }
+    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     json_json_body = json_body.to_dict()
 
@@ -46,6 +52,7 @@ def _get_kwargs(
         "cookies": cookies,
         "timeout": client.get_timeout(),
         "json": json_json_body,
+        "params": params,
     }
 
 
@@ -87,11 +94,13 @@ def sync_detailed(
     client: AuthenticatedClient,
     name: str,
     json_body: TextClassificationBulkData,
+    team: Union[Unset, str] = UNSET,
 ) -> Response[Union[BulkResponse, ErrorMessage, ErrorMessage, HTTPValidationError]]:
     kwargs = _get_kwargs(
         client=client,
         name=name,
         json_body=json_body,
+        team=team,
     )
 
     response = httpx.post(
@@ -106,6 +115,7 @@ def sync(
     client: AuthenticatedClient,
     name: str,
     json_body: TextClassificationBulkData,
+    team: Union[Unset, str] = UNSET,
 ) -> Optional[Union[BulkResponse, ErrorMessage, ErrorMessage, HTTPValidationError]]:
     """Includes a chunk of record data with provided dataset bulk information
 
@@ -115,6 +125,8 @@ def sync(
         The dataset name
     bulk:
         The bulk data
+    teams_query:
+        Team query params
     service:
         the Service
     datasets:
@@ -130,6 +142,7 @@ def sync(
         client=client,
         name=name,
         json_body=json_body,
+        team=team,
     ).parsed
 
 
@@ -138,11 +151,13 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
     name: str,
     json_body: TextClassificationBulkData,
+    team: Union[Unset, str] = UNSET,
 ) -> Response[Union[BulkResponse, ErrorMessage, ErrorMessage, HTTPValidationError]]:
     kwargs = _get_kwargs(
         client=client,
         name=name,
         json_body=json_body,
+        team=team,
     )
 
     async with httpx.AsyncClient() as _client:
@@ -156,6 +171,7 @@ async def asyncio(
     client: AuthenticatedClient,
     name: str,
     json_body: TextClassificationBulkData,
+    team: Union[Unset, str] = UNSET,
 ) -> Optional[Union[BulkResponse, ErrorMessage, ErrorMessage, HTTPValidationError]]:
     """Includes a chunk of record data with provided dataset bulk information
 
@@ -165,6 +181,8 @@ async def asyncio(
         The dataset name
     bulk:
         The bulk data
+    teams_query:
+        Team query params
     service:
         the Service
     datasets:
@@ -181,5 +199,6 @@ async def asyncio(
             client=client,
             name=name,
             json_body=json_body,
+            team=team,
         )
     ).parsed

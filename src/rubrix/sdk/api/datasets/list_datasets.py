@@ -20,29 +20,41 @@ import httpx
 from ...client import AuthenticatedClient
 from ...models.dataset import Dataset
 from ...models.error_message import ErrorMessage
-from ...types import Response
+from ...models.http_validation_error import HTTPValidationError
+from ...types import UNSET, Response, Unset
 
 
 def _get_kwargs(
     *,
     client: AuthenticatedClient,
+    team: Union[Unset, List[str]] = UNSET,
 ) -> Dict[str, Any]:
     url = "{}/api/datasets/".format(client.base_url)
 
     headers: Dict[str, Any] = client.get_headers()
     cookies: Dict[str, Any] = client.get_cookies()
 
+    json_team: Union[Unset, List[Any]] = UNSET
+    if not isinstance(team, Unset):
+        json_team = team
+
+    params: Dict[str, Any] = {
+        "team": json_team,
+    }
+    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
+
     return {
         "url": url,
         "headers": headers,
         "cookies": cookies,
         "timeout": client.get_timeout(),
+        "params": params,
     }
 
 
 def _parse_response(
     *, response: httpx.Response
-) -> Optional[Union[List[Dataset], ErrorMessage, ErrorMessage]]:
+) -> Optional[Union[List[Dataset], ErrorMessage, ErrorMessage, HTTPValidationError]]:
     if response.status_code == 200:
         response_200 = []
         _response_200 = response.json()
@@ -60,12 +72,16 @@ def _parse_response(
         response_500 = ErrorMessage.from_dict(response.json())
 
         return response_500
+    if response.status_code == 422:
+        response_422 = HTTPValidationError.from_dict(response.json())
+
+        return response_422
     return None
 
 
 def _build_response(
     *, response: httpx.Response
-) -> Response[Union[List[Dataset], ErrorMessage, ErrorMessage]]:
+) -> Response[Union[List[Dataset], ErrorMessage, ErrorMessage, HTTPValidationError]]:
     return Response(
         status_code=response.status_code,
         content=response.content,
@@ -77,9 +93,11 @@ def _build_response(
 def sync_detailed(
     *,
     client: AuthenticatedClient,
-) -> Response[Union[List[Dataset], ErrorMessage, ErrorMessage]]:
+    team: Union[Unset, List[str]] = UNSET,
+) -> Response[Union[List[Dataset], ErrorMessage, ErrorMessage, HTTPValidationError]]:
     kwargs = _get_kwargs(
         client=client,
+        team=team,
     )
 
     response = httpx.get(
@@ -92,11 +110,14 @@ def sync_detailed(
 def sync(
     *,
     client: AuthenticatedClient,
-) -> Optional[Union[List[Dataset], ErrorMessage, ErrorMessage]]:
+    team: Union[Unset, List[str]] = UNSET,
+) -> Optional[Union[List[Dataset], ErrorMessage, ErrorMessage, HTTPValidationError]]:
     """List accessible user datasets
 
     Parameters
     ----------
+    teams:
+        A list of teams used for retrieve datasets
     service:
         The datasets service
     current_user:
@@ -108,15 +129,18 @@ def sync(
 
     return sync_detailed(
         client=client,
+        team=team,
     ).parsed
 
 
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
-) -> Response[Union[List[Dataset], ErrorMessage, ErrorMessage]]:
+    team: Union[Unset, List[str]] = UNSET,
+) -> Response[Union[List[Dataset], ErrorMessage, ErrorMessage, HTTPValidationError]]:
     kwargs = _get_kwargs(
         client=client,
+        team=team,
     )
 
     async with httpx.AsyncClient() as _client:
@@ -128,11 +152,14 @@ async def asyncio_detailed(
 async def asyncio(
     *,
     client: AuthenticatedClient,
-) -> Optional[Union[List[Dataset], ErrorMessage, ErrorMessage]]:
+    team: Union[Unset, List[str]] = UNSET,
+) -> Optional[Union[List[Dataset], ErrorMessage, ErrorMessage, HTTPValidationError]]:
     """List accessible user datasets
 
     Parameters
     ----------
+    teams:
+        A list of teams used for retrieve datasets
     service:
         The datasets service
     current_user:
@@ -145,5 +172,6 @@ async def asyncio(
     return (
         await asyncio_detailed(
             client=client,
+            team=team,
         )
     ).parsed

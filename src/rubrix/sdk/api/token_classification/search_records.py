@@ -34,6 +34,7 @@ def _get_kwargs(
     client: AuthenticatedClient,
     name: str,
     json_body: TokenClassificationSearchRequest,
+    team: Union[Unset, str] = UNSET,
     limit: Union[Unset, int] = 50,
     from_: Union[Unset, int] = 0,
 ) -> Dict[str, Any]:
@@ -45,6 +46,7 @@ def _get_kwargs(
     cookies: Dict[str, Any] = client.get_cookies()
 
     params: Dict[str, Any] = {
+        "team": team,
         "limit": limit,
         "from": from_,
     }
@@ -114,6 +116,7 @@ def sync_detailed(
     client: AuthenticatedClient,
     name: str,
     json_body: TokenClassificationSearchRequest,
+    team: Union[Unset, str] = UNSET,
     limit: Union[Unset, int] = 50,
     from_: Union[Unset, int] = 0,
 ) -> Response[
@@ -128,6 +131,7 @@ def sync_detailed(
         client=client,
         name=name,
         json_body=json_body,
+        team=team,
         limit=limit,
         from_=from_,
     )
@@ -144,6 +148,7 @@ def sync(
     client: AuthenticatedClient,
     name: str,
     json_body: TokenClassificationSearchRequest,
+    team: Union[Unset, str] = UNSET,
     limit: Union[Unset, int] = 50,
     from_: Union[Unset, int] = 0,
 ) -> Optional[
@@ -162,6 +167,8 @@ def sync(
         The dataset name
     search:
         THe search query request
+    teams_query:
+        The teams query params
     pagination:
         The pagination params
     service:
@@ -179,6 +186,7 @@ def sync(
         client=client,
         name=name,
         json_body=json_body,
+        team=team,
         limit=limit,
         from_=from_,
     ).parsed
@@ -189,6 +197,7 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
     name: str,
     json_body: TokenClassificationSearchRequest,
+    team: Union[Unset, str] = UNSET,
     limit: Union[Unset, int] = 50,
     from_: Union[Unset, int] = 0,
 ) -> Response[
@@ -203,6 +212,7 @@ async def asyncio_detailed(
         client=client,
         name=name,
         json_body=json_body,
+        team=team,
         limit=limit,
         from_=from_,
     )
@@ -218,6 +228,7 @@ async def asyncio(
     client: AuthenticatedClient,
     name: str,
     json_body: TokenClassificationSearchRequest,
+    team: Union[Unset, str] = UNSET,
     limit: Union[Unset, int] = 50,
     from_: Union[Unset, int] = 0,
 ) -> Optional[
@@ -236,6 +247,8 @@ async def asyncio(
         The dataset name
     search:
         THe search query request
+    teams_query:
+        The teams query params
     pagination:
         The pagination params
     service:
@@ -254,6 +267,7 @@ async def asyncio(
             client=client,
             name=name,
             json_body=json_body,
+            team=team,
             limit=limit,
             from_=from_,
         )
