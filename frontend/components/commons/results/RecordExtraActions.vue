@@ -163,21 +163,35 @@ export default {
     background: white;
     border-radius: 3px;
     box-shadow: 0 5px 11px 0 rgba(0,0,0,0.50);
-    padding: 3px;
+    padding: 3px 3px 0 3px;
     min-width: 135px;
     div {
       padding: 0.5em;
       color: $font-secondary-dark;
       cursor: pointer;
       display: block;
-      border-bottom: 1px solid palette(grey, smooth);
-      border-radius: 3px;
       background: white;
       transition: background 0.3s ease-in-out;
+      position: relative;
+      margin-bottom: 3px;
+      &:after {
+        content: "";
+        width: 100%;
+        height: 1px;
+        background: palette(grey, smooth);
+        margin: 1px 0;
+        display: block;
+        position: absolute;
+        bottom: -3px;
+        left: 0;
+      }
       &:last-child {
-        border-bottom: none;
+        &:after {
+          content: none;
+        }
       }
       &:hover {
+        border-radius: 3px;
         transition: background 0.3s ease-in-out;
         background: palette(grey, smooth);
       }
