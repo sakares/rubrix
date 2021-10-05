@@ -25,7 +25,7 @@
           }"
           @click="selectGroup(group)"
         >
-          <svgicon v-if="group === 'sort'" name="sort" width="14" height="14" />
+          <svgicon v-if="group === 'Sort'" name="sort" width="14" height="14" />
           {{ group }}
           <span v-if="itemsAppliedOnGroup(group)"
             >({{ itemsAppliedOnGroup(group) }})</span
